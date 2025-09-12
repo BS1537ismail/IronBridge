@@ -1,3 +1,5 @@
+using IronBridge.CacheService.Interface;
+using IronBridge.CacheService.Repository;
 using IronBridge.IronDomain.Interfaces;
 using IronBridge.IronDomain.Managers;
 using IronBridge.IronStorage.Interface;

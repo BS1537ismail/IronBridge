@@ -1,8 +1,8 @@
-using IronBridge.IronStorage.Interface;
+using IronBridge.CacheService.Interface;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 
-namespace IronBridge.IronStorage.Repository
+namespace IronBridge.CacheService.Repository
 {
     public class CacheService : ICacheService
     {
@@ -17,7 +17,7 @@ namespace IronBridge.IronStorage.Repository
         {
             var value = await _distributedCache.GetStringAsync(key);
             if (string.IsNullOrEmpty(value))
-                return default(T);
+                return default;
 
             return JsonSerializer.Deserialize<T>(value);
         }

@@ -1,4 +1,5 @@
-﻿using IronBridge.IronDomain.Interfaces;
+﻿using IronBridge.CacheService.Interface;
+using IronBridge.IronDomain.Interfaces;
 using IronBridge.IronStorage.Interface;
 using IronBridge.Models;
 using Mapster;

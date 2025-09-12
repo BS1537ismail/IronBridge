@@ -25,7 +25,7 @@ namespace IronBridge.Controllers
         public async Task<IActionResult> GetIronBridgesAsync()
         {
             var result = await ironBridgeManager.GetIronBridge();
-            return Ok(result.Adapt<List<IronBridges>>());
+            return Ok(result);
         }
 
         [HttpPost]
@@ -45,7 +45,7 @@ namespace IronBridge.Controllers
         public async Task<IActionResult> DeleteIronBridgesByIdAsync(int id)
         {
             var result = await ironBridgeManager.DeleteIronBridge(id);
-            return Ok(result.Adapt<IronBridges>());
+            return Ok(result);
         }
     }
 }

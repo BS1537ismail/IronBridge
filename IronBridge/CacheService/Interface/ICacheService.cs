@@ -1,4 +1,4 @@
-namespace IronBridge.IronStorage.Interface
+namespace IronBridge.CacheService.Interface
 {
     public interface ICacheService
     {
