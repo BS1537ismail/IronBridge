@@ -34,6 +34,8 @@ jobs:
     needs: test-and-build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/development' && github.event_name == 'push'
+    permissions:
+      contents: write
     
     steps:
     - uses: actions/checkout@v4
@@ -43,11 +45,12 @@ jobs:
         
     - name: Configure Git
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --global user.email "md.ismail@brainstation-23.com"
+        git config --global user.name "BS1537ismail"
         
     - name: Merge to master
       run: |
-        git checkout master
-        git merge origin/development --no-ff -m "Auto-merge from development to master"
+        git fetch origin
+        git checkout -B master origin/master
+        git merge origin/development --no-ff -m "Auto-merge from development to master [skip ci]"
         git push origin master
