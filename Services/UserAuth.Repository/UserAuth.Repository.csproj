@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UserAuth.Domain\UserAuth.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\IronBridge.Shared\IronBridge.Shared.csproj" />
   </ItemGroup>
 
 </Project>

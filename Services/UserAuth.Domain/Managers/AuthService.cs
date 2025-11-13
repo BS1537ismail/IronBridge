@@ -1,7 +1,8 @@
 using IronBridge.Shared.DTOs;
-using UserAuth.Domain.Entities;
+using UserAuth.Domain.Models;
 using UserAuth.Domain.Interfaces;
 using UserAuth.Repository.Interfaces;
+using Mapster;
 
 namespace UserAuth.Domain.Managers;
 
@@ -34,7 +35,7 @@ public class AuthService : IAuthService
             IsActive = true
         };
 
-        await _userRepository.AddAsync(user);
+        await _userRepository.AddAsync(user.Adapt<Repository.Data.User>());
 
         var token = _jwtService.GenerateToken(user);
 
@@ -57,7 +58,7 @@ public class AuthService : IAuthService
             return null;
         }
 
-        var token = _jwtService.GenerateToken(user);
+        var token = _jwtService.GenerateToken(user.Adapt<User>());
 
         return new LoginResponseDto
         {

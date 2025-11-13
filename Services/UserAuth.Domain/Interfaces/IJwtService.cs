@@ -1,4 +1,4 @@
-using UserAuth.Domain.Entities;
+using UserAuth.Domain.Models;
 
 namespace UserAuth.Domain.Interfaces;
 

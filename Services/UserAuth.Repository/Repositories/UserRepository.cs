@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using UserAuth.Domain.Entities;
 using UserAuth.Repository.Data;
 using UserAuth.Repository.Interfaces;
 

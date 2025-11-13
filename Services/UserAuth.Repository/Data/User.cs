@@ -1,7 +1,5 @@
 using IronBridge.Shared.Enums;
-
-namespace UserAuth.Domain.Models;
-
+namespace UserAuth.Repository.Data;
 public class User
 {
     public Guid Id { get; set; } = Guid.NewGuid();

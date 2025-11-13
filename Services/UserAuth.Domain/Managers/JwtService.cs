@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
-using UserAuth.Domain.Entities;
+using UserAuth.Domain.Models;
 using UserAuth.Domain.Interfaces;
 
 namespace UserAuth.Domain.Managers;
