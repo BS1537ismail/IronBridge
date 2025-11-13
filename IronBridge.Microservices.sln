@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B65757C4-B749-447D-B0CE-F5890770BCC4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserAuth.Service", "UserAuth.Service", "{068C3557-3F10-4924-8E2B-150FA8AF2702}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserAuth", "UserAuth", "{068C3557-3F10-4924-8E2B-150FA8AF2702}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserAuth.Service", "Services\UserAuth.Service\UserAuth.Service.csproj", "{7CEF9448-7447-4916-811E-8281BA4BE10B}"
 EndProject
@@ -13,15 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserAuth.Domain", "Services
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserAuth.Repository", "Services\UserAuth.Repository\UserAuth.Repository.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Product.Service", "Product.Service", "{BC8AF346-DD48-421B-8B34-C895117F7205}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Product", "Product", "{BC8AF346-DD48-421B-8B34-C895117F7205}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Service", "Services\Product.Service\Product.Service.csproj", "{C1E2A2C6-2CEF-4B0A-AA06-A7226D257731}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Booking.Service", "Booking.Service", "{0353194B-85C7-4BFD-9E65-9300EE30DDF6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Booking", "Booking", "{0353194B-85C7-4BFD-9E65-9300EE30DDF6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booking.Service", "Services\Booking.Service\Booking.Service.csproj", "{79EA5A9F-E7A9-442A-8078-554AF4341921}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Admin.Service", "Admin.Service", "{C61B8CC4-F478-4FA8-B28C-8461BBAEFFF5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Admin", "Admin", "{C61B8CC4-F478-4FA8-B28C-8461BBAEFFF5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin.Service", "Services\Admin.Service\Admin.Service.csproj", "{5FBA3ED4-3D46-49DB-A0E2-BFC5D44D8DD8}"
 EndProject
