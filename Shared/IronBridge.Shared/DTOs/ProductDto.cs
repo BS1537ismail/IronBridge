@@ -1,0 +1,38 @@
+namespace IronBridge.Shared.DTOs;
+
+public class ProductDto
+{
+    public int Id { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int Stock { get; set; }
+    public string Category { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public Guid CreatedBy { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public bool IsActive { get; set; }
+}
+
+public class CreateProductDto
+{
+    public string ProductName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int Stock { get; set; }
+    public string Category { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public Guid CreatedBy { get; set; }
+}
+
+public class UpdateProductDto
+{
+    public string ProductName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int Stock { get; set; }
+    public string Category { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public bool IsActive { get; set; }
+}
