@@ -9,7 +9,7 @@ WORKDIR /src
 # Copy shared project
 COPY ["../../Shared/IronBridge.Shared/IronBridge.Shared.csproj", "Shared/IronBridge.Shared/"]
 
-# Copy service project
+# Copy Service project
 COPY ["Booking.Service.csproj", "Booking.Service/"]
 
 # Restore dependencies

@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using Booking.Service.Data;
-using Booking.Service.Services;
+using Booking.Domain.Interfaces;
+using Booking.Domain.Managers;
+using Booking.Repository.Interfaces;
+using Booking.Repository.Repositories;
+using Booking.Repository.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BookingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add HttpClient for Product Service
-builder.Services.AddHttpClient<IProductHttpClient, ProductHttpClient>();
+// Add Repository
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 
-// Add Services
-builder.Services.AddScoped<IBookingService, BookingService>();
+// Add Manageres
+builder.Services.AddScoped<IBookingManager, BookingManager>();
 
 // Add Controllers
 builder.Services.AddControllers();
@@ -31,7 +34,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.MapControllers();
-
 app.Run();
