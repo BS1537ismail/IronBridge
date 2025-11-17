@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Product.Service.Models;
 
-namespace Product.Service.Data;
+namespace Product.Repository.Models;
 
 public class ProductDbContext : DbContext
 {
@@ -9,13 +8,13 @@ public class ProductDbContext : DbContext
     {
     }
 
-    public DbSet<Models.Product> Products { get; set; }
+    public DbSet<Product> Products { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Models.Product>(entity =>
+        modelBuilder.Entity<Product>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.ProductName).IsRequired().HasMaxLength(200);
