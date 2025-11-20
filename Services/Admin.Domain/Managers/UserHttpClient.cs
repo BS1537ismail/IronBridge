@@ -1,7 +1,9 @@
+using Admin.Domain.Interfaces;
 using IronBridge.Shared.DTOs;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
-namespace Admin.Service.Services;
+namespace Admin.Service.HttpClients;
 
 public class UserHttpClient : IUserHttpClient
 {

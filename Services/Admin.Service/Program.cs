@@ -1,10 +1,25 @@
-using Admin.Service.Services;
+using Admin.Domain.Interfaces;
+using Admin.Domain.Managers;
+using Admin.Repository;
+using Admin.Repository.Interfaces;
+using Admin.Repository.Repositories;
+using Admin.Service.HttpClients;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add HttpClients for UserAuth and Product Services
+// Add DbContext - using same database as Product service
+builder.Services.AddDbContext<ProductDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Repository
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+// Add Managers
+builder.Services.AddScoped<IProductManager, ProductManager>();
+
+// Add HttpClient for UserAuth Service
 builder.Services.AddHttpClient<IUserHttpClient, UserHttpClient>();
-builder.Services.AddHttpClient<IProductHttpClient, ProductHttpClient>();
 
 // Add Controllers
 builder.Services.AddControllers();

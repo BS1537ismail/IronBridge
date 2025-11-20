@@ -10,9 +10,9 @@ public class ProductDto
     public string Category { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
     public Guid CreatedBy { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public bool IsActive { get; set; } = true;
 }
 
 public class CreateProductDto

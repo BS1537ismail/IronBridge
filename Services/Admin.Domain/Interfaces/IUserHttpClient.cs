@@ -1,6 +1,6 @@
 using IronBridge.Shared.DTOs;
 
-namespace Admin.Service.Services;
+namespace Admin.Domain.Interfaces;
 
 public interface IUserHttpClient
 {

@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Product.Repository.Migrations
+namespace Admin.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProduct : Migration
+    public partial class AddProductsTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
