@@ -7,17 +7,29 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy shared project
-COPY ["../../Shared/IronBridge.Shared/IronBridge.Shared.csproj", "Shared/IronBridge.Shared/"]
+COPY ["Shared/IronBridge.Shared/IronBridge.Shared.csproj", "Shared/IronBridge.Shared/"]
+
+# Copy domain and repository projects
+COPY ["Services/Admin.Repository/Admin.Repository.csproj", "Services/Admin.Repository/"]
+COPY ["Services/Admin.Domain/Admin.Domain.csproj", "Services/Admin.Domain/"]
 
 # Copy service project
-COPY ["Admin.Service.csproj", "Admin.Service/"]
+COPY ["Services/Admin.Service/Admin.Service.csproj", "Services/Admin.Service/"]
 
 # Restore dependencies
-RUN dotnet restore "Admin.Service/Admin.Service.csproj"
+RUN dotnet restore "Services/Admin.Service/Admin.Service.csproj"
 
-# Copy everything else
-COPY . Admin.Service/
-WORKDIR "/src/Admin.Service"
+# Copy shared source
+COPY ["Shared/IronBridge.Shared/", "Shared/IronBridge.Shared/"]
+
+# Copy domain and repository source
+COPY ["Services/Admin.Repository/", "Services/Admin.Repository/"]
+COPY ["Services/Admin.Domain/", "Services/Admin.Domain/"]
+
+# Copy service source
+COPY ["Services/Admin.Service/", "Services/Admin.Service/"]
+
+WORKDIR "/src/Services/Admin.Service"
 RUN dotnet build "Admin.Service.csproj" -c Release -o /app/build
 
 FROM build AS publish

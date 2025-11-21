@@ -7,17 +7,29 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy shared project
-COPY ["../../Shared/IronBridge.Shared/IronBridge.Shared.csproj", "Shared/IronBridge.Shared/"]
+COPY ["Shared/IronBridge.Shared/IronBridge.Shared.csproj", "Shared/IronBridge.Shared/"]
+
+# Copy domain and repository projects
+COPY ["Services/Product.Repository/Product.Repository.csproj", "Services/Product.Repository/"]
+COPY ["Services/Product.Domain/Product.Domain.csproj", "Services/Product.Domain/"]
 
 # Copy service project
-COPY ["Product.Service.csproj", "Product.Service/"]
+COPY ["Services/Product.Service/Product.Service.csproj", "Services/Product.Service/"]
 
 # Restore dependencies
-RUN dotnet restore "Product.Service/Product.Service.csproj"
+RUN dotnet restore "Services/Product.Service/Product.Service.csproj"
 
-# Copy everything else
-COPY . Product.Service/
-WORKDIR "/src/Product.Service"
+# Copy shared source
+COPY ["Shared/IronBridge.Shared/", "Shared/IronBridge.Shared/"]
+
+# Copy domain and repository source
+COPY ["Services/Product.Repository/", "Services/Product.Repository/"]
+COPY ["Services/Product.Domain/", "Services/Product.Domain/"]
+
+# Copy service source
+COPY ["Services/Product.Service/", "Services/Product.Service/"]
+
+WORKDIR "/src/Services/Product.Service"
 RUN dotnet build "Product.Service.csproj" -c Release -o /app/build
 
 FROM build AS publish
