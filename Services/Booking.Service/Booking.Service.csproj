@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\IronBridge.Shared\IronBridge.Shared.csproj" />
+    <ProjectReference Include="..\Booking.Domain\Booking.Domain.csproj" />
+    <ProjectReference Include="..\Booking.Repository\Booking.Repository.csproj" />
   </ItemGroup>
 
 </Project>

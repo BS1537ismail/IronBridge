@@ -1,6 +1,6 @@
 using IronBridge.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Product.Service.Services;
+using Product.Domain.Interfaces;
 
 namespace Product.Service.Controllers;
 
@@ -8,29 +8,29 @@ namespace Product.Service.Controllers;
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
 {
-    private readonly IProductService _productService;
+    private readonly IProductManager _productService;
 
-    public ProductController(IProductService productService)
+    public ProductController(IProductManager productService)
     {
         _productService = productService;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
+    public async Task<IActionResult> GetAllProducts()
     {
         var products = await _productService.GetAllProductsAsync();
         return Ok(products);
     }
 
     [HttpGet("active")]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetActiveProducts()
+    public async Task<IActionResult> GetActiveProducts()
     {
         var products = await _productService.GetActiveProductsAsync();
         return Ok(products);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProductDto>> GetProductById(int id)
+    public async Task<IActionResult> GetProductById(int id)
     {
         var product = await _productService.GetProductByIdAsync(id);
 
@@ -41,21 +41,21 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("category/{category}")]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(string category)
+    public async Task<IActionResult> GetProductsByCategory(string category)
     {
         var products = await _productService.GetProductsByCategoryAsync(category);
         return Ok(products);
     }
 
     [HttpPost]
-    public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductDto dto)
+    public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto dto)
     {
         var product = await _productService.CreateProductAsync(dto);
         return CreatedAtAction(nameof(GetProductById), new { id = product!.Id }, product);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ProductDto>> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
+    public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
     {
         var product = await _productService.UpdateProductAsync(id, dto);
 
@@ -66,7 +66,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteProduct(int id)
+    public async Task<IActionResult> DeleteProduct(int id)
     {
         var result = await _productService.DeleteProductAsync(id);
 
@@ -77,7 +77,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPatch("{id}/stock")]
-    public async Task<ActionResult> UpdateStock(int id, [FromQuery] int quantity)
+    public async Task<IActionResult> UpdateStock(int id, [FromQuery] int quantity)
     {
         var result = await _productService.UpdateStockAsync(id, quantity);
 

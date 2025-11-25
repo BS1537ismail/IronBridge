@@ -1,7 +1,6 @@
+using Admin.Domain.Interfaces;
 using IronBridge.Shared.DTOs;
-using IronBridge.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Admin.Service.Services;
 
 namespace Admin.Service.Controllers;
 
@@ -9,26 +8,24 @@ namespace Admin.Service.Controllers;
 [Route("api/[controller]")]
 public class AdminProductController : ControllerBase
 {
-    private readonly IProductHttpClient _productClient;
-    private readonly IUserHttpClient _userClient;
+    private readonly IProductManager _productManager;
 
-    public AdminProductController(IProductHttpClient productClient, IUserHttpClient userClient)
+    public AdminProductController(IProductManager productManager)
     {
-        _productClient = productClient;
-        _userClient = userClient;
+        _productManager = productManager;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
     {
-        var products = await _productClient.GetAllProductsAsync();
+        var products = await _productManager.GetAllProductsAsync();
         return Ok(products);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProductById(int id)
     {
-        var product = await _productClient.GetProductByIdAsync(id);
+        var product = await _productManager.GetProductByIdAsync(id);
 
         if (product == null)
             return NotFound(new { message = "Product not found" });
@@ -39,16 +36,10 @@ public class AdminProductController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductDto dto)
     {
-        // Verify user is admin
-        var user = await _userClient.GetUserByIdAsync(dto.CreatedBy);
-
-        if (user == null || user.Role != UserRole.Admin)
-            return Unauthorized(new { message = "Only admins can create products" });
-
-        var product = await _productClient.CreateProductAsync(dto);
+        var product = await _productManager.CreateProductAsync(dto, dto.CreatedBy);
 
         if (product == null)
-            return BadRequest(new { message = "Failed to create product" });
+            return Unauthorized(new { message = "Only admins can create products" });
 
         return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
     }
@@ -56,16 +47,10 @@ public class AdminProductController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ProductDto>> UpdateProduct(int id, [FromBody] UpdateProductDto dto, [FromQuery] Guid adminId)
     {
-        // Verify user is admin
-        var user = await _userClient.GetUserByIdAsync(adminId);
-
-        if (user == null || user.Role != UserRole.Admin)
-            return Unauthorized(new { message = "Only admins can update products" });
-
-        var product = await _productClient.UpdateProductAsync(id, dto);
+        var product = await _productManager.UpdateProductAsync(id, dto, adminId);
 
         if (product == null)
-            return NotFound(new { message = "Product not found or update failed" });
+            return Unauthorized(new { message = "Only admins can update products or product not found" });
 
         return Ok(product);
     }
@@ -73,16 +58,10 @@ public class AdminProductController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProduct(int id, [FromQuery] Guid adminId)
     {
-        // Verify user is admin
-        var user = await _userClient.GetUserByIdAsync(adminId);
-
-        if (user == null || user.Role != UserRole.Admin)
-            return Unauthorized(new { message = "Only admins can delete products" });
-
-        var result = await _productClient.DeleteProductAsync(id);
+        var result = await _productManager.DeleteProductAsync(id, adminId);
 
         if (!result)
-            return NotFound(new { message = "Product not found or delete failed" });
+            return Unauthorized(new { message = "Only admins can delete products or product not found" });
 
         return NoContent();
     }
