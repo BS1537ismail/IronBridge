@@ -26,6 +26,13 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Initialize database
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<BookingDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
