@@ -4,12 +4,24 @@ using Product.Domain.Managers;
 using Product.Repository.Interfaces;
 using Product.Repository.Models;
 using Product.Repository.Repositories;
+using IronBridge.Shared.Interfaces;
+using IronBridge.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext
 builder.Services.AddDbContext<ProductDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Redis Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "ProductService_";
+});
+
+// Add Cache Service
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 // Add Repository
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

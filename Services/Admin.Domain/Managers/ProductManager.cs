@@ -2,6 +2,7 @@ using Admin.Domain.Interfaces;
 using Admin.Repository.Interfaces;
 using IronBridge.Shared.DTOs;
 using IronBridge.Shared.Enums;
+using IronBridge.Shared.Interfaces;
 using Mapster;
 
 namespace Admin.Domain.Managers;
@@ -10,23 +11,45 @@ public class ProductManager : IProductManager
 {
     private readonly IProductRepository _productRepository;
     private readonly IUserHttpClient _userClient;
+    private readonly ICacheService _cacheService;
 
-    public ProductManager(IProductRepository productRepository, IUserHttpClient userClient)
+    public ProductManager(IProductRepository productRepository, IUserHttpClient userClient, ICacheService cacheService)
     {
         _productRepository = productRepository;
         _userClient = userClient;
+        _cacheService = cacheService;
     }
 
     public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
     {
+        var cacheKey = "admin_products_all";
+        var cachedProducts = await _cacheService.GetAsync<IEnumerable<ProductDto>>(cacheKey);
+
+        if (cachedProducts != null)
+            return cachedProducts;
+
         var products = await _productRepository.GetAllAsync();
-        return products.Adapt<IEnumerable<ProductDto>>();
+        var productDtos = products.Adapt<IEnumerable<ProductDto>>();
+
+        await _cacheService.SetAsync(cacheKey, productDtos, TimeSpan.FromMinutes(5));
+        return productDtos;
     }
 
     public async Task<ProductDto?> GetProductByIdAsync(int productId)
     {
+        var cacheKey = $"admin_product_{productId}";
+        var cachedProduct = await _cacheService.GetAsync<ProductDto>(cacheKey);
+
+        if (cachedProduct != null)
+            return cachedProduct;
+
         var product = await _productRepository.GetByIdAsync(productId);
-        return product?.Adapt<ProductDto>();
+        var productDto = product?.Adapt<ProductDto>();
+
+        if (productDto != null)
+            await _cacheService.SetAsync(cacheKey, productDto, TimeSpan.FromMinutes(5));
+
+        return productDto;
     }
 
     public async Task<ProductDto?> CreateProductAsync(CreateProductDto dto, Guid adminUserId)
@@ -50,7 +73,12 @@ public class ProductManager : IProductManager
         };
 
         var createdProduct = await _productRepository.CreateAsync(product);
-        return createdProduct.Adapt<ProductDto>();
+        var createdProductDto = createdProduct.Adapt<ProductDto>();
+
+        await _cacheService.RemoveAsync("admin_products_all");
+        await _cacheService.SetAsync($"admin_product_{createdProduct.Id}", createdProductDto, TimeSpan.FromMinutes(5));
+
+        return createdProductDto;
     }
 
     public async Task<ProductDto?> UpdateProductAsync(int productId, UpdateProductDto dto, Guid adminUserId)
@@ -75,7 +103,12 @@ public class ProductManager : IProductManager
         product.IsActive = dto.IsActive;
 
         var updatedProduct = await _productRepository.UpdateAsync(product);
-        return updatedProduct?.Adapt<ProductDto>();
+        var updatedProductDto = updatedProduct?.Adapt<ProductDto>();
+
+        await _cacheService.RemoveAsync($"admin_product_{productId}");
+        await _cacheService.RemoveAsync("admin_products_all");
+
+        return updatedProductDto;
     }
 
     public async Task<bool> DeleteProductAsync(int productId, Guid adminUserId)
@@ -86,6 +119,14 @@ public class ProductManager : IProductManager
         if (user == null || user.Role != UserRole.Admin)
             return false;
 
-        return await _productRepository.DeleteAsync(productId);
+        var result = await _productRepository.DeleteAsync(productId);
+
+        if (result)
+        {
+            await _cacheService.RemoveAsync($"admin_product_{productId}");
+            await _cacheService.RemoveAsync("admin_products_all");
+        }
+
+        return result;
     }
 }

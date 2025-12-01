@@ -1,4 +1,5 @@
 using IronBridge.Shared.DTOs;
+using IronBridge.Shared.Interfaces;
 using Mapster;
 using Product.Domain.Interfaces;
 using Product.Repository.Interfaces;
@@ -8,41 +9,76 @@ namespace Product.Domain.Managers;
 public class ProductManager : IProductManager
 {
     private readonly IProductRepository _productRepository;
+    private readonly ICacheService _cacheService;
 
-    public ProductManager(IProductRepository productRepository)
+    public ProductManager(IProductRepository productRepository, ICacheService cacheService)
     {
         _productRepository = productRepository;
+        _cacheService = cacheService;
     }
 
     public async Task<IList<Models.Product>> GetAllProductsAsync()
     {
-        var products = await _productRepository.GetAllAsync();
+        var cacheKey = "products_all";
+        var cachedProducts = await _cacheService.GetAsync<IList<Models.Product>>(cacheKey);
 
-        return products.Adapt<IList<Models.Product>>();
+        if (cachedProducts != null)
+            return cachedProducts;
+
+        var products = await _productRepository.GetAllAsync();
+        var productList = products.Adapt<IList<Models.Product>>();
+
+        await _cacheService.SetAsync(cacheKey, productList, TimeSpan.FromMinutes(5));
+        return productList;
     }
 
     public async Task<IList<Models.Product>> GetActiveProductsAsync()
     {
-        var products = await _productRepository.GetActiveProductsAsync();
+        var cacheKey = "products_active";
+        var cachedProducts = await _cacheService.GetAsync<IList<Models.Product>>(cacheKey);
 
-        return products.Adapt<IList<Models.Product>>();
+        if (cachedProducts != null)
+            return cachedProducts;
+
+        var products = await _productRepository.GetActiveProductsAsync();
+        var productList = products.Adapt<IList<Models.Product>>();
+
+        await _cacheService.SetAsync(cacheKey, productList, TimeSpan.FromMinutes(5));
+        return productList;
     }
 
     public async Task<Models.Product?> GetProductByIdAsync(int id)
     {
+        var cacheKey = $"product_{id}";
+        var cachedProduct = await _cacheService.GetAsync<Models.Product>(cacheKey);
+
+        if (cachedProduct != null)
+            return cachedProduct;
+
         var product = await _productRepository.GetByIdAsync(id);
 
         if (product == null)
             return null;
 
-        return product.Adapt<Models.Product>();
+        var productModel = product.Adapt<Models.Product>();
+        await _cacheService.SetAsync(cacheKey, productModel, TimeSpan.FromMinutes(5));
+
+        return productModel;
     }
 
     public async Task<IList<Models.Product>> GetProductsByCategoryAsync(string category)
     {
-        var products = await _productRepository.GetProductsByCategoryAsync(category);
+        var cacheKey = $"products_category_{category}";
+        var cachedProducts = await _cacheService.GetAsync<IList<Models.Product>>(cacheKey);
 
-        return products.Adapt<IList<Models.Product>>();
+        if (cachedProducts != null)
+            return cachedProducts;
+
+        var products = await _productRepository.GetProductsByCategoryAsync(category);
+        var productList = products.Adapt<IList<Models.Product>>();
+
+        await _cacheService.SetAsync(cacheKey, productList, TimeSpan.FromMinutes(5));
+        return productList;
     }
 
     public async Task<ProductDto?> CreateProductAsync(CreateProductDto dto)
@@ -61,7 +97,7 @@ public class ProductManager : IProductManager
 
         var savedProduct = await _productRepository.AddAsync(product.Adapt<Repository.Models.Product>());
 
-        return new ProductDto
+        var productDto = new ProductDto
         {
             Id = savedProduct.Id,
             ProductName = savedProduct.ProductName,
@@ -75,6 +111,12 @@ public class ProductManager : IProductManager
             UpdatedAt = savedProduct.UpdatedAt,
             IsActive = savedProduct.IsActive
         };
+
+        await _cacheService.RemoveAsync("products_all");
+        await _cacheService.RemoveAsync("products_active");
+        await _cacheService.RemoveAsync($"products_category_{savedProduct.Category}");
+
+        return productDto;
     }
 
     public async Task<ProductDto?> UpdateProductAsync(int id, UpdateProductDto dto)
@@ -83,6 +125,8 @@ public class ProductManager : IProductManager
 
         if (product == null)
             return null;
+
+        var oldCategory = product.Category;
 
         product.ProductName = dto.ProductName != "string" ? dto.ProductName : product.ProductName;
         product.Description = dto.Description != "string" ? dto.Description : product.Description;
@@ -95,7 +139,7 @@ public class ProductManager : IProductManager
 
         await _productRepository.UpdateAsync(product);
 
-        return new ProductDto
+        var productDto = new ProductDto
         {
             Id = product.Id,
             ProductName = product.ProductName,
@@ -109,6 +153,14 @@ public class ProductManager : IProductManager
             UpdatedAt = product.UpdatedAt,
             IsActive = product.IsActive
         };
+
+        await _cacheService.RemoveAsync($"product_{id}");
+        await _cacheService.RemoveAsync("products_all");
+        await _cacheService.RemoveAsync("products_active");
+        await _cacheService.RemoveAsync($"products_category_{oldCategory}");
+        await _cacheService.RemoveAsync($"products_category_{product.Category}");
+
+        return productDto;
     }
 
     public async Task<bool> DeleteProductAsync(int id)
@@ -122,6 +174,12 @@ public class ProductManager : IProductManager
         product.UpdatedAt = DateTime.UtcNow;
 
         await _productRepository.UpdateAsync(product);
+
+        await _cacheService.RemoveAsync($"product_{id}");
+        await _cacheService.RemoveAsync("products_all");
+        await _cacheService.RemoveAsync("products_active");
+        await _cacheService.RemoveAsync($"products_category_{product.Category}");
+
         return true;
     }
 
@@ -136,6 +194,12 @@ public class ProductManager : IProductManager
         product.UpdatedAt = DateTime.UtcNow;
 
         await _productRepository.UpdateAsync(product);
+
+        await _cacheService.RemoveAsync($"product_{id}");
+        await _cacheService.RemoveAsync("products_all");
+        await _cacheService.RemoveAsync("products_active");
+        await _cacheService.RemoveAsync($"products_category_{product.Category}");
+
         return true;
     }
 }

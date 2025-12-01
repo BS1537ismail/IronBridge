@@ -1,4 +1,5 @@
 using IronBridge.Shared.DTOs;
+using IronBridge.Shared.Interfaces;
 using Mapster;
 using Booking.Domain.Interfaces;
 using Booking.Repository.Interfaces;
@@ -8,42 +9,90 @@ namespace Booking.Domain.Managers;
 public class BookingManager : IBookingManager
 {
     private readonly IBookingRepository _bookingRepository;
+    private readonly ICacheService _cacheService;
 
-    public BookingManager(IBookingRepository bookingRepository)
+    public BookingManager(IBookingRepository bookingRepository, ICacheService cacheService)
     {
         _bookingRepository = bookingRepository;
+        _cacheService = cacheService;
     }
 
     public async Task<IList<Models.Booking>> GetAllBookingsAsync()
     {
+        var cacheKey = "bookings_all";
+        var cachedBookings = await _cacheService.GetAsync<IList<Models.Booking>>(cacheKey);
+
+        if (cachedBookings != null)
+            return cachedBookings;
+
         var bookings = await _bookingRepository.GetAllAsync();
-        return bookings.Adapt<IList<Models.Booking>>();
+        var bookingList = bookings.Adapt<IList<Models.Booking>>();
+
+        await _cacheService.SetAsync(cacheKey, bookingList, TimeSpan.FromMinutes(3));
+        return bookingList;
     }
 
     public async Task<IList<Models.Booking>> GetActiveBookingsAsync()
     {
+        var cacheKey = "bookings_active";
+        var cachedBookings = await _cacheService.GetAsync<IList<Models.Booking>>(cacheKey);
+
+        if (cachedBookings != null)
+            return cachedBookings;
+
         var bookings = await _bookingRepository.GetActiveBookingsAsync();
-        return bookings.Adapt<IList<Models.Booking>>();
+        var bookingList = bookings.Adapt<IList<Models.Booking>>();
+
+        await _cacheService.SetAsync(cacheKey, bookingList, TimeSpan.FromMinutes(3));
+        return bookingList;
     }
 
     public async Task<Models.Booking?> GetBookingByIdAsync(int id)
     {
+        var cacheKey = $"booking_{id}";
+        var cachedBooking = await _cacheService.GetAsync<Models.Booking>(cacheKey);
+
+        if (cachedBooking != null)
+            return cachedBooking;
+
         var booking = await _bookingRepository.GetByIdAsync(id);
         if (booking == null)
             return null;
-        return booking.Adapt<Models.Booking>();
+
+        var bookingModel = booking.Adapt<Models.Booking>();
+        await _cacheService.SetAsync(cacheKey, bookingModel, TimeSpan.FromMinutes(3));
+
+        return bookingModel;
     }
 
     public async Task<IList<Models.Booking>> GetBookingsByUserIdAsync(string userId)
     {
+        var cacheKey = $"bookings_user_{userId}";
+        var cachedBookings = await _cacheService.GetAsync<IList<Models.Booking>>(cacheKey);
+
+        if (cachedBookings != null)
+            return cachedBookings;
+
         var bookings = await _bookingRepository.GetBookingsByUserIdAsync(userId);
-        return bookings.Adapt<IList<Models.Booking>>();
+        var bookingList = bookings.Adapt<IList<Models.Booking>>();
+
+        await _cacheService.SetAsync(cacheKey, bookingList, TimeSpan.FromMinutes(3));
+        return bookingList;
     }
 
     public async Task<IList<Models.Booking>> GetBookingsByStatusAsync(string status)
     {
+        var cacheKey = $"bookings_status_{status}";
+        var cachedBookings = await _cacheService.GetAsync<IList<Models.Booking>>(cacheKey);
+
+        if (cachedBookings != null)
+            return cachedBookings;
+
         var bookings = await _bookingRepository.GetBookingsByStatusAsync(status);
-        return bookings.Adapt<IList<Models.Booking>>();
+        var bookingList = bookings.Adapt<IList<Models.Booking>>();
+
+        await _cacheService.SetAsync(cacheKey, bookingList, TimeSpan.FromMinutes(3));
+        return bookingList;
     }
 
     public async Task<BookingDto?> CreateBookingAsync(CreateBookingDto dto)
@@ -62,7 +111,7 @@ public class BookingManager : IBookingManager
 
         var savedBooking = await _bookingRepository.AddAsync(booking.Adapt<Repository.Models.Booking>());
 
-        return new BookingDto
+        var bookingDto = new BookingDto
         {
             Id = savedBooking.Id,
             UserId = savedBooking.UserId,
@@ -76,6 +125,12 @@ public class BookingManager : IBookingManager
             UpdatedAt = savedBooking.UpdatedAt,
             IsActive = savedBooking.IsActive
         };
+
+        await _cacheService.RemoveAsync("bookings_all");
+        await _cacheService.RemoveAsync("bookings_active");
+        await _cacheService.RemoveAsync($"bookings_user_{savedBooking.UserId}");
+
+        return bookingDto;
     }
 
     public async Task<BookingDto?> UpdateBookingAsync(int id, UpdateBookingDto dto)
@@ -95,7 +150,7 @@ public class BookingManager : IBookingManager
 
         await _bookingRepository.UpdateAsync(booking);
 
-        return new BookingDto
+        var bookingDto = new BookingDto
         {
             Id = booking.Id,
             UserId = booking.UserId,
@@ -109,6 +164,14 @@ public class BookingManager : IBookingManager
             UpdatedAt = booking.UpdatedAt,
             IsActive = booking.IsActive
         };
+
+        await _cacheService.RemoveAsync($"booking_{id}");
+        await _cacheService.RemoveAsync("bookings_all");
+        await _cacheService.RemoveAsync("bookings_active");
+        await _cacheService.RemoveAsync($"bookings_user_{booking.UserId}");
+        await _cacheService.RemoveAsync($"bookings_status_{booking.Status}");
+
+        return bookingDto;
     }
 
     public async Task<bool> DeleteBookingAsync(int id)
@@ -120,6 +183,12 @@ public class BookingManager : IBookingManager
         booking.IsActive = false;
         booking.UpdatedAt = DateTime.UtcNow;
         await _bookingRepository.UpdateAsync(booking);
+
+        await _cacheService.RemoveAsync($"booking_{id}");
+        await _cacheService.RemoveAsync("bookings_all");
+        await _cacheService.RemoveAsync("bookings_active");
+        await _cacheService.RemoveAsync($"bookings_user_{booking.UserId}");
+
         return true;
     }
 
@@ -129,9 +198,18 @@ public class BookingManager : IBookingManager
         if (booking == null)
             return false;
 
+        var oldStatus = booking.Status;
         booking.Status = status;
         booking.UpdatedAt = DateTime.UtcNow;
         await _bookingRepository.UpdateAsync(booking);
+
+        await _cacheService.RemoveAsync($"booking_{id}");
+        await _cacheService.RemoveAsync("bookings_all");
+        await _cacheService.RemoveAsync("bookings_active");
+        await _cacheService.RemoveAsync($"bookings_status_{oldStatus}");
+        await _cacheService.RemoveAsync($"bookings_status_{status}");
+        await _cacheService.RemoveAsync($"bookings_user_{booking.UserId}");
+
         return true;
     }
 }

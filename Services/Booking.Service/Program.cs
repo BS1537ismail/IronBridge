@@ -4,12 +4,24 @@ using Booking.Domain.Managers;
 using Booking.Repository.Interfaces;
 using Booking.Repository.Repositories;
 using Booking.Repository.Models;
+using IronBridge.Shared.Interfaces;
+using IronBridge.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext
 builder.Services.AddDbContext<BookingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Redis Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "BookingService_";
+});
+
+// Add Cache Service
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 // Add Repository
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();

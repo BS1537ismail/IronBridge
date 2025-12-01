@@ -1,4 +1,5 @@
 using IronBridge.Shared.DTOs;
+using IronBridge.Shared.Interfaces;
 using UserAuth.Domain.Models;
 using UserAuth.Domain.Interfaces;
 using UserAuth.Repository.Interfaces;
@@ -10,11 +11,13 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IJwtService _jwtService;
+    private readonly ICacheService _cacheService;
 
-    public AuthService(IUserRepository userRepository, IJwtService jwtService)
+    public AuthService(IUserRepository userRepository, IJwtService jwtService, ICacheService cacheService)
     {
         _userRepository = userRepository;
         _jwtService = jwtService;
+        _cacheService = cacheService;
     }
 
     public async Task<LoginResponseDto?> RegisterAsync(RegisterUserDto dto)
@@ -72,12 +75,18 @@ public class AuthService : IAuthService
 
     public async Task<UserDto?> GetUserByIdAsync(Guid userId)
     {
+        var cacheKey = $"user_{userId}";
+        var cachedUser = await _cacheService.GetAsync<UserDto>(cacheKey);
+
+        if (cachedUser != null)
+            return cachedUser;
+
         var user = await _userRepository.GetByIdAsync(userId);
 
         if (user == null)
             return null;
 
-        return new UserDto
+        var userDto = new UserDto
         {
             Id = user.Id,
             FullName = user.FullName,
@@ -86,16 +95,25 @@ public class AuthService : IAuthService
             Role = user.Role,
             IsActive = user.IsActive
         };
+
+        await _cacheService.SetAsync(cacheKey, userDto, TimeSpan.FromMinutes(10));
+        return userDto;
     }
 
     public async Task<UserDto?> GetUserByEmailAsync(string email)
     {
+        var cacheKey = $"user_email_{email}";
+        var cachedUser = await _cacheService.GetAsync<UserDto>(cacheKey);
+
+        if (cachedUser != null)
+            return cachedUser;
+
         var user = await _userRepository.GetByEmailAsync(email);
 
         if (user == null)
             return null;
 
-        return new UserDto
+        var userDto = new UserDto
         {
             Id = user.Id,
             FullName = user.FullName,
@@ -104,5 +122,8 @@ public class AuthService : IAuthService
             Role = user.Role,
             IsActive = user.IsActive
         };
+
+        await _cacheService.SetAsync(cacheKey, userDto, TimeSpan.FromMinutes(10));
+        return userDto;
     }
 }

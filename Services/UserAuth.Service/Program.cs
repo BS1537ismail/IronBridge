@@ -7,12 +7,24 @@ using UserAuth.Repository.Interfaces;
 using UserAuth.Repository.Repositories;
 using UserAuth.Domain.Interfaces;
 using UserAuth.Domain.Managers;
+using IronBridge.Shared.Interfaces;
+using IronBridge.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext
 builder.Services.AddDbContext<UserAuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Redis Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "UserAuthService_";
+});
+
+// Add Cache Service
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 // Add JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"];

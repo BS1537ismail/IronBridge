@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ironbridge-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
@@ -32,8 +49,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=UserAuthDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=redis:6379
     depends_on:
       sqlserver:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - ironbridge-network
@@ -49,8 +69,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ProductDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=redis:6379
     depends_on:
       sqlserver:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - ironbridge-network
@@ -66,9 +89,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=BookingDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=redis:6379
       - Services__ProductService=http://product-service:8080
     depends_on:
       sqlserver:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       product-service:
         condition: service_started
@@ -86,10 +112,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AdminDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=redis:6379
       - Services__UserAuthService=http://userauth-service:8080
       - Services__ProductService=http://product-service:8080
     depends_on:
       sqlserver:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       userauth-service:
         condition: service_started
@@ -104,4 +133,5 @@ networks:
     driver: bridge
 
 volumes:
+  redis_data:
   sqlserver_data:
