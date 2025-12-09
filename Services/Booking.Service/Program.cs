@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Booking.Domain.Interfaces;
 using Booking.Domain.Managers;
+using Booking.Domain.Services;
+using Booking.Domain.Models;
 using Booking.Repository.Interfaces;
 using Booking.Repository.Repositories;
 using Booking.Repository.Models;
@@ -23,11 +25,19 @@ builder.Services.AddStackExchangeRedisCache(options =>
 // Add Cache Service
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
+// Configure SSLCommerz Settings
+builder.Services.Configure<SSLCommerzSettings>(builder.Configuration.GetSection("SSLCommerz"));
+
+// Add HttpClient for SSLCommerz
+builder.Services.AddHttpClient<ISSLCommerzService, SSLCommerzService>();
+
 // Add Repository
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
-// Add Manageres
+// Add Managers
 builder.Services.AddScoped<IBookingManager, BookingManager>();
+builder.Services.AddScoped<IPaymentManager, PaymentManager>();
 
 // Add Controllers
 builder.Services.AddControllers();
