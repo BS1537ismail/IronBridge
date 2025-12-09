@@ -24,6 +24,14 @@ public class CreateBookingDto
     public decimal TotalAmount { get; set; }
     public string Status { get; set; } = "Pending";
     public string CreatedBy { get; set; } = string.Empty;
+
+    // Customer details for payment
+    public string CustomerName { get; set; } = string.Empty;
+    public string CustomerEmail { get; set; } = string.Empty;
+    public string CustomerPhone { get; set; } = string.Empty;
+    public string CustomerAddress { get; set; } = string.Empty;
+    public string CustomerCity { get; set; } = string.Empty;
+    public string CustomerCountry { get; set; } = "Bangladesh";
 }
 
 public class UpdateBookingDto
