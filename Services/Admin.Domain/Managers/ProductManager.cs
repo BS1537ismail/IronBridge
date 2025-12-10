@@ -22,7 +22,7 @@ public class ProductManager : IProductManager
 
     public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
     {
-        var cacheKey = "admin_products_all";
+        var cacheKey = "products_all";
         var cachedProducts = await _cacheService.GetAsync<IEnumerable<ProductDto>>(cacheKey);
 
         if (cachedProducts != null)
@@ -37,7 +37,7 @@ public class ProductManager : IProductManager
 
     public async Task<ProductDto?> GetProductByIdAsync(int productId)
     {
-        var cacheKey = $"admin_product_{productId}";
+        var cacheKey = $"product_{productId}";
         var cachedProduct = await _cacheService.GetAsync<ProductDto>(cacheKey);
 
         if (cachedProduct != null)
@@ -75,8 +75,8 @@ public class ProductManager : IProductManager
         var createdProduct = await _productRepository.CreateAsync(product);
         var createdProductDto = createdProduct.Adapt<ProductDto>();
 
-        await _cacheService.RemoveAsync("admin_products_all");
-        await _cacheService.SetAsync($"admin_product_{createdProduct.Id}", createdProductDto, TimeSpan.FromMinutes(5));
+        await _cacheService.RemoveAsync("products_all");
+        await _cacheService.SetAsync($"product_{createdProduct.Id}", createdProductDto, TimeSpan.FromMinutes(5));
 
         return createdProductDto;
     }
@@ -105,8 +105,8 @@ public class ProductManager : IProductManager
         var updatedProduct = await _productRepository.UpdateAsync(product);
         var updatedProductDto = updatedProduct?.Adapt<ProductDto>();
 
-        await _cacheService.RemoveAsync($"admin_product_{productId}");
-        await _cacheService.RemoveAsync("admin_products_all");
+        await _cacheService.RemoveAsync($"product_{productId}");
+        await _cacheService.RemoveAsync("products_all");
 
         return updatedProductDto;
     }
@@ -123,8 +123,8 @@ public class ProductManager : IProductManager
 
         if (result)
         {
-            await _cacheService.RemoveAsync($"admin_product_{productId}");
-            await _cacheService.RemoveAsync("admin_products_all");
+            await _cacheService.RemoveAsync($"product_{productId}");
+            await _cacheService.RemoveAsync("products_all");
         }
 
         return result;

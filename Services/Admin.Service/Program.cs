@@ -18,7 +18,7 @@ builder.Services.AddDbContext<ProductDbContext>(options =>
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "AdminService_";
+    options.InstanceName = "IronBridge_";
 });
 
 // Add Cache Service

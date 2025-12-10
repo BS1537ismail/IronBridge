@@ -42,17 +42,17 @@ public class ProductRepository : IProductRepository
         return products;
     }
 
-    public async Task<Models.Product> AddAsync(Models.Product product)
-    {
-        var entity = product.Adapt<Models.Product>();
-        _context.Products.Add(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
+    //public async Task<Models.Product> AddAsync(Models.Product product)
+    //{
+    //    var entity = product.Adapt<Models.Product>();
+    //    _context.Products.Add(entity);
+    //    await _context.SaveChangesAsync();
+    //    return entity;
+    //}
 
-    public async Task UpdateAsync(Models.Product product)
-    {
-        _context.Products.Update(product);
-        await _context.SaveChangesAsync();
-    }
+    //public async Task UpdateAsync(Models.Product product)
+    //{
+    //    _context.Products.Update(product);
+    //    await _context.SaveChangesAsync();
+    //}
 }

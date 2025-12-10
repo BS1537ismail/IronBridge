@@ -15,6 +15,7 @@ public class ProductDbContext : DbContext
         modelBuilder.Entity<Product>(entity => { entity.ToTable("Products", t => t.ExcludeFromMigrations(true)); });
         base.OnModelCreating(modelBuilder);
 
+        //this is no need to add cause it is now in the admin service
         //modelBuilder.Entity<Product>(entity =>
         //{
         //    entity.HasKey(e => e.Id);

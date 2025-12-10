@@ -47,43 +47,43 @@ public class ProductController : ControllerBase
         return Ok(products);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto dto)
-    {
-        var product = await _productService.CreateProductAsync(dto);
-        return CreatedAtAction(nameof(GetProductById), new { id = product!.Id }, product);
-    }
+    //[HttpPost]
+    //public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto dto)
+    //{
+    //    var product = await _productService.CreateProductAsync(dto);
+    //    return CreatedAtAction(nameof(GetProductById), new { id = product!.Id }, product);
+    //}
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
-    {
-        var product = await _productService.UpdateProductAsync(id, dto);
+    //[HttpPut("{id}")]
+    //public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
+    //{
+    //    var product = await _productService.UpdateProductAsync(id, dto);
 
-        if (product == null)
-            return NotFound(new { message = "Product not found" });
+    //    if (product == null)
+    //        return NotFound(new { message = "Product not found" });
 
-        return Ok(product);
-    }
+    //    return Ok(product);
+    //}
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduct(int id)
-    {
-        var result = await _productService.DeleteProductAsync(id);
+    //[HttpDelete("{id}")]
+    //public async Task<IActionResult> DeleteProduct(int id)
+    //{
+    //    var result = await _productService.DeleteProductAsync(id);
 
-        if (!result)
-            return NotFound(new { message = "Product not found" });
+    //    if (!result)
+    //        return NotFound(new { message = "Product not found" });
 
-        return NoContent();
-    }
+    //    return NoContent();
+    //}
 
-    [HttpPatch("{id}/stock")]
-    public async Task<IActionResult> UpdateStock(int id, [FromQuery] int quantity)
-    {
-        var result = await _productService.UpdateStockAsync(id, quantity);
+    //[HttpPatch("{id}/stock")]
+    //public async Task<IActionResult> UpdateStock(int id, [FromQuery] int quantity)
+    //{
+    //    var result = await _productService.UpdateStockAsync(id, quantity);
 
-        if (!result)
-            return BadRequest(new { message = "Insufficient stock or product not found" });
+    //    if (!result)
+    //        return BadRequest(new { message = "Insufficient stock or product not found" });
 
-        return NoContent();
-    }
+    //    return NoContent();
+    //}
 }

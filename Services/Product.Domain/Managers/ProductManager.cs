@@ -81,125 +81,125 @@ public class ProductManager : IProductManager
         return productList;
     }
 
-    public async Task<ProductDto?> CreateProductAsync(CreateProductDto dto)
-    {
-        var product = new Models.Product
-        {
-            ProductName = dto.ProductName,
-            Description = dto.Description,
-            Price = dto.Price,
-            Stock = dto.Stock,
-            Category = dto.Category,
-            ImageUrl = dto.ImageUrl,
-            CreatedBy = dto.CreatedBy,
-            IsActive = true
-        };
+    //public async Task<ProductDto?> CreateProductAsync(CreateProductDto dto)
+    //{
+    //    var product = new Models.Product
+    //    {
+    //        ProductName = dto.ProductName,
+    //        Description = dto.Description,
+    //        Price = dto.Price,
+    //        Stock = dto.Stock,
+    //        Category = dto.Category,
+    //        ImageUrl = dto.ImageUrl,
+    //        CreatedBy = dto.CreatedBy,
+    //        IsActive = true
+    //    };
 
-        var savedProduct = await _productRepository.AddAsync(product.Adapt<Repository.Models.Product>());
+    //    var savedProduct = await _productRepository.AddAsync(product.Adapt<Repository.Models.Product>());
 
-        var productDto = new ProductDto
-        {
-            Id = savedProduct.Id,
-            ProductName = savedProduct.ProductName,
-            Description = savedProduct.Description,
-            Price = savedProduct.Price,
-            Stock = savedProduct.Stock,
-            Category = savedProduct.Category,
-            ImageUrl = savedProduct.ImageUrl,
-            CreatedBy = savedProduct.CreatedBy,
-            CreatedAt = savedProduct.CreatedAt,
-            UpdatedAt = savedProduct.UpdatedAt,
-            IsActive = savedProduct.IsActive
-        };
+    //    var productDto = new ProductDto
+    //    {
+    //        Id = savedProduct.Id,
+    //        ProductName = savedProduct.ProductName,
+    //        Description = savedProduct.Description,
+    //        Price = savedProduct.Price,
+    //        Stock = savedProduct.Stock,
+    //        Category = savedProduct.Category,
+    //        ImageUrl = savedProduct.ImageUrl,
+    //        CreatedBy = savedProduct.CreatedBy,
+    //        CreatedAt = savedProduct.CreatedAt,
+    //        UpdatedAt = savedProduct.UpdatedAt,
+    //        IsActive = savedProduct.IsActive
+    //    };
 
-        await _cacheService.RemoveAsync("products_all");
-        await _cacheService.RemoveAsync("products_active");
-        await _cacheService.RemoveAsync($"products_category_{savedProduct.Category}");
+    //    await _cacheService.RemoveAsync("products_all");
+    //    await _cacheService.RemoveAsync("products_active");
+    //    await _cacheService.RemoveAsync($"products_category_{savedProduct.Category}");
 
-        return productDto;
-    }
+    //    return productDto;
+    //}
 
-    public async Task<ProductDto?> UpdateProductAsync(int id, UpdateProductDto dto)
-    {
-        var product = await _productRepository.GetByIdAsync(id);
+    //public async Task<ProductDto?> UpdateProductAsync(int id, UpdateProductDto dto)
+    //{
+    //    var product = await _productRepository.GetByIdAsync(id);
 
-        if (product == null)
-            return null;
+    //    if (product == null)
+    //        return null;
 
-        var oldCategory = product.Category;
+    //    var oldCategory = product.Category;
 
-        product.ProductName = dto.ProductName != "string" ? dto.ProductName : product.ProductName;
-        product.Description = dto.Description != "string" ? dto.Description : product.Description;
-        product.Price = dto.Price != 0 ? dto.Price : product.Price;
-        product.Stock = dto.Stock != 0 ? dto.Stock : product.Stock;
-        product.Category = dto.Category != "string" ? dto.Category : product.Category;
-        product.ImageUrl = dto.ImageUrl != "string" ? dto.ImageUrl : product.ImageUrl;
-        product.IsActive = dto.IsActive;
-        product.UpdatedAt = DateTime.UtcNow;
+    //    product.ProductName = dto.ProductName != "string" ? dto.ProductName : product.ProductName;
+    //    product.Description = dto.Description != "string" ? dto.Description : product.Description;
+    //    product.Price = dto.Price != 0 ? dto.Price : product.Price;
+    //    product.Stock = dto.Stock != 0 ? dto.Stock : product.Stock;
+    //    product.Category = dto.Category != "string" ? dto.Category : product.Category;
+    //    product.ImageUrl = dto.ImageUrl != "string" ? dto.ImageUrl : product.ImageUrl;
+    //    product.IsActive = dto.IsActive;
+    //    product.UpdatedAt = DateTime.UtcNow;
 
-        await _productRepository.UpdateAsync(product);
+    //    await _productRepository.UpdateAsync(product);
 
-        var productDto = new ProductDto
-        {
-            Id = product.Id,
-            ProductName = product.ProductName,
-            Description = product.Description,
-            Price = product.Price,
-            Stock = product.Stock,
-            Category = product.Category,
-            ImageUrl = product.ImageUrl,
-            CreatedBy = product.CreatedBy,
-            CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt,
-            IsActive = product.IsActive
-        };
+    //    var productDto = new ProductDto
+    //    {
+    //        Id = product.Id,
+    //        ProductName = product.ProductName,
+    //        Description = product.Description,
+    //        Price = product.Price,
+    //        Stock = product.Stock,
+    //        Category = product.Category,
+    //        ImageUrl = product.ImageUrl,
+    //        CreatedBy = product.CreatedBy,
+    //        CreatedAt = product.CreatedAt,
+    //        UpdatedAt = product.UpdatedAt,
+    //        IsActive = product.IsActive
+    //    };
 
-        await _cacheService.RemoveAsync($"product_{id}");
-        await _cacheService.RemoveAsync("products_all");
-        await _cacheService.RemoveAsync("products_active");
-        await _cacheService.RemoveAsync($"products_category_{oldCategory}");
-        await _cacheService.RemoveAsync($"products_category_{product.Category}");
+    //    await _cacheService.RemoveAsync($"product_{id}");
+    //    await _cacheService.RemoveAsync("products_all");
+    //    await _cacheService.RemoveAsync("products_active");
+    //    await _cacheService.RemoveAsync($"products_category_{oldCategory}");
+    //    await _cacheService.RemoveAsync($"products_category_{product.Category}");
 
-        return productDto;
-    }
+    //    return productDto;
+    //}
 
-    public async Task<bool> DeleteProductAsync(int id)
-    {
-        var product = await _productRepository.GetByIdAsync(id);
+    //public async Task<bool> DeleteProductAsync(int id)
+    //{
+    //    var product = await _productRepository.GetByIdAsync(id);
 
-        if (product == null)
-            return false;
+    //    if (product == null)
+    //        return false;
 
-        product.IsActive = false;
-        product.UpdatedAt = DateTime.UtcNow;
+    //    product.IsActive = false;
+    //    product.UpdatedAt = DateTime.UtcNow;
 
-        await _productRepository.UpdateAsync(product);
+    //    await _productRepository.UpdateAsync(product);
 
-        await _cacheService.RemoveAsync($"product_{id}");
-        await _cacheService.RemoveAsync("products_all");
-        await _cacheService.RemoveAsync("products_active");
-        await _cacheService.RemoveAsync($"products_category_{product.Category}");
+    //    await _cacheService.RemoveAsync($"product_{id}");
+    //    await _cacheService.RemoveAsync("products_all");
+    //    await _cacheService.RemoveAsync("products_active");
+    //    await _cacheService.RemoveAsync($"products_category_{product.Category}");
 
-        return true;
-    }
+    //    return true;
+    //}
 
-    public async Task<bool> UpdateStockAsync(int id, int quantity)
-    {
-        var product = await _productRepository.GetByIdAsync(id);
+    //public async Task<bool> UpdateStockAsync(int id, int quantity)
+    //{
+    //    var product = await _productRepository.GetByIdAsync(id);
 
-        if (product == null || product.Stock < quantity)
-            return false;
+    //    if (product == null || product.Stock < quantity)
+    //        return false;
 
-        product.Stock -= quantity;
-        product.UpdatedAt = DateTime.UtcNow;
+    //    product.Stock -= quantity;
+    //    product.UpdatedAt = DateTime.UtcNow;
 
-        await _productRepository.UpdateAsync(product);
+    //    await _productRepository.UpdateAsync(product);
 
-        await _cacheService.RemoveAsync($"product_{id}");
-        await _cacheService.RemoveAsync("products_all");
-        await _cacheService.RemoveAsync("products_active");
-        await _cacheService.RemoveAsync($"products_category_{product.Category}");
+    //    await _cacheService.RemoveAsync($"product_{id}");
+    //    await _cacheService.RemoveAsync("products_all");
+    //    await _cacheService.RemoveAsync("products_active");
+    //    await _cacheService.RemoveAsync($"products_category_{product.Category}");
 
-        return true;
-    }
+    //    return true;
+    //}
 }
