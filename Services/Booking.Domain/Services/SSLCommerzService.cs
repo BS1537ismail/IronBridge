@@ -52,12 +52,19 @@ public class SSLCommerzService : ISSLCommerzService
             throw new Exception($"SSLCommerz API Error: {responseString}");
         }
 
-        var result = JsonSerializer.Deserialize<SSLCommerzInitResponse>(responseString, new JsonSerializerOptions
+        try
         {
-            PropertyNameCaseInsensitive = true
-        });
+            var result = JsonSerializer.Deserialize<SSLCommerzInitResponse>(responseString, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
-        return result ?? new SSLCommerzInitResponse { status = "FAILED", failedreason = "Invalid response from gateway" };
+            return result ?? new SSLCommerzInitResponse { status = "FAILED", failedreason = "Invalid response from gateway" };
+        }
+        catch (JsonException ex)
+        {
+            throw new Exception($"Failed to parse SSLCommerz response. Error: {ex.Message}. Response: {responseString}");
+        }
     }
 
     public async Task<SSLCommerzValidationResponse> ValidatePaymentAsync(string transactionId)
@@ -72,11 +79,18 @@ public class SSLCommerzService : ISSLCommerzService
             throw new Exception($"SSLCommerz Validation Error: {responseString}");
         }
 
-        var result = JsonSerializer.Deserialize<SSLCommerzValidationResponse>(responseString, new JsonSerializerOptions
+        try
         {
-            PropertyNameCaseInsensitive = true
-        });
+            var result = JsonSerializer.Deserialize<SSLCommerzValidationResponse>(responseString, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
-        return result ?? new SSLCommerzValidationResponse { status = "FAILED", error = "Invalid validation response" };
+            return result ?? new SSLCommerzValidationResponse { status = "FAILED", error = "Invalid validation response" };
+        }
+        catch (JsonException ex)
+        {
+            throw new Exception($"Failed to parse SSLCommerz validation response. Error: {ex.Message}. Response: {responseString}");
+        }
     }
 }

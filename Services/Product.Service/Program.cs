@@ -29,6 +29,17 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 // Add Services
 builder.Services.AddScoped<IProductManager, ProductManager>();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 // Add Controllers
 builder.Services.AddControllers();
 
@@ -53,6 +64,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS
+app.UseCors("AllowAll");
 
 app.MapControllers();
 

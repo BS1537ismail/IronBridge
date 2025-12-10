@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Booking.Domain.Models;
 
 public class SSLCommerzInitResponse
@@ -8,7 +10,7 @@ public class SSLCommerzInitResponse
     public string GatewayPageURL { get; set; } = string.Empty;
     public string storeBanner { get; set; } = string.Empty;
     public string storeLogo { get; set; } = string.Empty;
-    public string desc { get; set; } = string.Empty;
+    public JsonElement? desc { get; set; }
     public string is_direct_pay_enable { get; set; } = string.Empty;
 }
 

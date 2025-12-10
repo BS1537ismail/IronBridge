@@ -33,6 +33,17 @@ builder.Services.AddScoped<IProductManager, ProductManager>();
 // Add HttpClient for UserAuth Service
 builder.Services.AddHttpClient<IUserHttpClient, UserHttpClient>();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 // Add Controllers
 builder.Services.AddControllers();
 
@@ -57,6 +68,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS
+app.UseCors("AllowAll");
 
 app.MapControllers();
 
