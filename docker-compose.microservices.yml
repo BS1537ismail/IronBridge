@@ -39,6 +39,27 @@ services:
       retries: 10
       start_period: 10s
 
+  apigateway:
+    build:
+      context: .
+      dockerfile: Gateway/ApiGateway/Dockerfile
+    container_name: apigateway
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - Jwt__Key=YourSuperSecretKeyForJWTTokenGenerationMustBe32CharsLong!
+      - Jwt__Issuer=IronBridge.UserAuth
+      - Jwt__Audience=IronBridge.Services
+    depends_on:
+      - userauth-service
+      - product-service
+      - booking-service
+      - admin-service
+    networks:
+      - ironbridge-network
+    restart: unless-stopped
+
   userauth-service:
     build:
       context: .
